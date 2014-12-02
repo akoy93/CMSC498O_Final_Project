@@ -27,7 +27,7 @@ if len(sys.argv) == 4:
     training = data[training_rows]
     testing = data[testing_rows]
 
-    np.savetxt(training_file, training)
-    np.savetxt(testing_file, testing)
+    np.savetxt(training_file, training, delimiter=",")
+    np.savetxt(testing_file, testing, delimiter=",")
 else:
   print "Incorrect usage. Use: \"python sample.py {NUM_TRAINING} {NUM_TESTING} {INPUT_FILE}\""

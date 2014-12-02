@@ -46,6 +46,7 @@ if len(sys.argv) == 4:
 
         # normalize rows and concatenate data into one line
         normalized = [normalize_row(r, open_price) for r in data]
+        normalized = normalized[::-1]
         normalized = np.hstack(normalized)
 
         arrstr = np.char.mod('%f', normalized)
