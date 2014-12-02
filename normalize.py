@@ -1,22 +1,22 @@
-# Usage: python compute_windows.py {DIRECTORY} {OUTPUT_FILE}
+# Usage: python normalize.py {NUMBER_OF_DAYS} {DIRECTORY} {OUTPUT_FILE}
 
 import numpy as np
 import pandas as pd
 import glob
 import sys
-import csv
 
 def normalize_row(row, open_price):
   def process_value(i):
     if i == 4:
-      return row[i]
+      return np.log(row[i] + 1)
     else:
       return row[i] / open_price
   return [process_value(i) for i in range(len(row))]
 
-if len(sys.argv) == 3:
-  directory = sys.argv[1]
-  output_file = sys.argv[2]
+if len(sys.argv) == 4:
+  num_days = int(sys.argv[1])
+  directory = sys.argv[2]
+  output_file = sys.argv[3]
 
   # get all csv files in the given directory
   files = glob.glob("%s/*.csv" % directory)
@@ -31,24 +31,27 @@ if len(sys.argv) == 3:
     try:
       data = pd.read_csv(f)
 
-      # drop unnecessary columns and move into one line
-      data = data.drop('Date', 1)
-      data = data.drop('Adj Close', 1)
+      if data.shape[0] >= num_days:
+        data = data[0:num_days]
 
-      # get open_price value
-      open_price = data.iloc[[data.shape[0] -1]]['Open'].values[0]
+        # drop unnecessary columns and move into one line
+        data = data.drop('Date', 1)
+        data = data.drop('Adj Close', 1)
 
-      # convert to numpy array
-      data = np.array(data)
+        # get open_price value
+        open_price = data.iloc[[data.shape[0] -1]]['Open'].values[0]
 
-      # normalize rows and concatenate data into one line
-      normalized = [normalize_row(r, open_price) for r in data]
-      normalized = np.hstack(normalized)
+        # convert to numpy array
+        data = np.array(data)
 
-      arrstr = np.char.mod('%f', normalized)
-      str = ",".join(arrstr)
+        # normalize rows and concatenate data into one line
+        normalized = [normalize_row(r, open_price) for r in data]
+        normalized = np.hstack(normalized)
 
-      results.append(str)
+        arrstr = np.char.mod('%f', normalized)
+        str = ",".join(arrstr)
+
+        results.append(str)
     except:
       print "ERROR: Unable to normalize %s" % f[len(directory) + 1:]
 
@@ -57,4 +60,4 @@ if len(sys.argv) == 3:
     for row in results:
       f.write(row + "\n")
 else:
-  print "Incorrect usage. Use: \"python normalize.py {DIRECTORY} {OUTPUT_FILE}\""
+  print "Incorrect usage. Use: \"python normalize.py {NUMBER_OF_DAYS} {DIRECTORY} {OUTPUT_FILE}\""
