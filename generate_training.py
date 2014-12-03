@@ -5,8 +5,6 @@ import pandas as pd
 import glob
 import sys
 
-NUM_DATA_POINTS = 5
-
 if len(sys.argv) != 5:
   print "Incorrect usage. Use: \"python generate_training.py {NUMBER_OF_DAYS} {NUM_DAYS_IN_WINDOW} {DIRECTORY} {OUTPUT_FILE}\""
   sys.exit()
@@ -33,6 +31,9 @@ for f in files:
       # drop unnecessary columns and move into one line
       data = data.set_index('Date')
       data = data.drop('Adj Close', 1)
+      data = data.drop('High', 1)
+      data = data.drop('Low', 1)
+      data = data.drop('Volume', 1)
 
       # convert into numpy array
       data = np.array(data)

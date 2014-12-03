@@ -10,10 +10,7 @@ import sklearn.linear_model as lm
 from sklearn import cross_validation
 
 NUMBER_OF_DAYS_IN_WINDOW = 10
-OPEN_INDEX = 0
-CLOSE_INDEX = 3
-VOLUME_INDEX = 4
-NUM_DATA_POINTS_PER_DAY = 5
+NUM_DATA_POINTS_PER_DAY = 2
 
 def tied_rank(x):
   """
@@ -74,8 +71,7 @@ def auc(actual, posterior):
   num_positive = len([0 for x in actual if x==1])
   num_negative = len(actual)-num_positive
   sum_positive = sum([r[i] for i in range(len(r)) if actual[i]==1])
-  auc = ((sum_positive - num_positive*(num_positive+1)/2.0) /
-         (num_negative*num_positive))
+  auc = ((sum_positive - num_positive*(num_positive+1)/2.0) / (num_negative*num_positive))
   sys.stdout.write('.')
   return auc
 
@@ -88,31 +84,20 @@ if len(sys.argv) != 2:
   sys.exit()
 
 num_days_in_window = NUMBER_OF_DAYS_IN_WINDOW
-open_index = OPEN_INDEX
-close_index = CLOSE_INDEX
 points_per_day = NUM_DATA_POINTS_PER_DAY
-training_file = sys.argv[1]
+points_in_window = num_days_in_window * points_per_day
 
 # load training data
-training = np.genfromtxt(training_file, delimiter=",")
-
-# non-volume columns
-points_in_window = num_days_in_window * points_per_day
-columns = set(range(0, points_in_window - points_per_day + 1)) - set(range(VOLUME_INDEX, points_in_window - points_per_day + 1, points_per_day)) 
-columns = sorted(list(columns))
+training = np.genfromtxt(sys.argv[1], delimiter=",")
 
 # normalize
 for row in training:
-  for c in columns:
-    row[c] = row[c] / row[0]
+  for i in range(points_in_window - points_per_day + 1):
+    row[i] = row[i] / row[0]
 
-# for now, only look at open and close columns
-columns = set(range(open_index, points_in_window - points_per_day + 1, points_per_day)) | set(range(close_index, points_in_window - points_per_day + 1, points_per_day))# | set(range(VOLUME_INDEX, points_in_window - points_per_day + 1, points_per_day))
-columns = list(sorted(columns))
-
-# normalize data and compute outcome
-X = np.array([p for p in training[:, columns]])
-y = (training[:, points_in_window - points_per_day + close_index] > training[:, points_in_window - points_per_day + open_index]) + 0
+# pull X and y
+X = np.array([p[range(points_in_window - 1)] for p in training])
+y = (training[:, points_in_window - points_per_day + 1] > training[:, points_in_window - points_per_day]) + 0
 
 # print cross validation score
 model = lm.LogisticRegression(penalty = "l2")
