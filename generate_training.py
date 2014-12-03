@@ -37,7 +37,7 @@ for f in files:
       data = data.drop('Adj Close', 1)
 
       # convert into numpy array
-      data = np.array(data)[::-1]
+      data = np.array(data)
 
       result = []
       for r in range(num_days_in_window):
