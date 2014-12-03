@@ -1,7 +1,6 @@
-all_training_500.csv
-training.csv
-500_days_normalized.csv
-notes.py
-sp500_training.csv
-grab_stocks.py
-train_with_volume.csv
+data/all_training_500.csv
+data/sp500_training.csv
+data/train_with_volume.csv
+data/training.csv
+experiments/grab_stocks.py
+experiments/notes.py
