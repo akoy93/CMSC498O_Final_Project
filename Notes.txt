@@ -1,0 +1,10 @@
+Notes
+LogisticRegression - fast and good accuracy
+SVM - good accuracy, but computation time is prohibative
+
+Insights
+- volume, high, and low do not add any accuracy
+- linear svm is relatively accurate, but slow
+- only linear methods seem to work
+- LogisticRegression is the best (works best with 'l2')
+- AUC scorer
