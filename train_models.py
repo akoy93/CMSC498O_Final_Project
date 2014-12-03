@@ -92,7 +92,7 @@ training = np.genfromtxt(training_file, delimiter=",")
 
 # for now, only look at open and close columns
 points_in_window = num_days_in_window * points_per_day
-columns = set(range(open_index, points_in_window, points_per_day)) | set(range(close_index, points_in_window, points_per_day))
+columns = set(range(open_index, points_in_window - points_per_day + 1, points_per_day)) | set(range(close_index, points_in_window - points_per_day + 1, points_per_day))
 columns = list(sorted(columns))
 
 # normalize data and compute outcome
