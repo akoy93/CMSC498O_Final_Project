@@ -4,3 +4,4 @@ training.csv
 notes.py
 sp500_training.csv
 grab_stocks.py
+train_with_volume.csv
