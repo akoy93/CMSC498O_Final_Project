@@ -30,14 +30,13 @@ for f in files:
     data = pd.read_csv(f)
 
     if data.shape[0] >= num_days_to_train:
-      data = data[0:num_days_to_train]
-
       # drop unnecessary columns and move into one line
       data = data.set_index('Date')
       data = data.drop('Adj Close', 1)
 
       # convert into numpy array
       data = np.array(data)
+      data = data[0:num_days_to_train]
 
       result = []
       for r in range(num_days_in_window):
@@ -48,4 +47,4 @@ for f in files:
     print "ERROR: Unable to generate training data for %s" % f[len(directory) + 1:]
 
 results = np.vstack(results)
-np.savetxt(output_file, results, delimiter=",", header=','.join([str(i) for i in range(1,num_days_in_window * NUM_DATA_POINTS + 1)]))
+np.savetxt(output_file, results, delimiter=",")
