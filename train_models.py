@@ -1,4 +1,4 @@
-# Usage: python train_models.py {TRAINING_FILE_NAME}
+# Usage: python train_models.py {TRAINING_FILE_NAME} {MODEL_OUTPUT_FILE}
 
 # We're training a model to determine if a stock will close above its open on the next day.
 # We're given the stock's data for a variable window and its opening price on the last day.
@@ -11,7 +11,6 @@ from sklearn import cross_validation
 
 NUMBER_OF_DAYS_IN_WINDOW = 10
 NUM_DATA_POINTS_PER_DAY = 2
-FILE_NAME = "model.pickle"
 
 def tied_rank(x):
   """
@@ -80,8 +79,8 @@ def auc_scorer(estimator, X, y):
   predicted = estimator.predict_proba(X)[:,1]
   return auc(y, predicted)
 
-if len(sys.argv) != 2:
-  print "Incorrect usage. Use: \"python train_models.py {TRAINING_FILE_NAME}\""
+if len(sys.argv) != 3:
+  print "Incorrect usage. Use: \"python train_models.py {TRAINING_FILE_NAME} {MODEL_OUTPUT_FILE}\""
   sys.exit()
 
 num_days_in_window = NUMBER_OF_DAYS_IN_WINDOW
@@ -103,7 +102,7 @@ y = (training[:, points_in_window - points_per_day + 1] > training[:, points_in_
 # build model and save
 model = lm.LogisticRegression(penalty = "l2").fit(X, y)
 
-with open(FILE_NAME, 'wb') as f:
+with open(sys.argv[2], 'wb') as f:
   pickle.dump(model, f)
   print("Model saved.")
 

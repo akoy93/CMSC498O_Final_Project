@@ -5,6 +5,7 @@ import pandas as pd
 import glob
 import sys
 import pickle
+from subprocess import call
 
 NUM_DAYS_IN_WINDOW = 10
 NUM_POINTS_PER_DAY = 2
@@ -17,17 +18,21 @@ directory = sys.argv[1]
 new_directory = "%s_predictions" % directory
 model_file_name = sys.argv[2]
 
+# create new directory
+call(["rm", "-rf", new_directory])
+call(["mkdir", new_directory])
+
 with open(model_file_name, "rb") as f:
   model = pickle.load(f)
   print "Model loaded."
 
   # get all csv files in the given directory
   files = glob.glob("%s/*.csv" % directory)
-  i = 0
+  file_num = 0
 
   for f in files:
-    i += 1
-    print "(%d/%d) - Making predictions for %s..." % (i, len(files), f[len(directory) + 1:])
+    file_num += 1
+    print "(%d/%d) - Making predictions for %s..." % (file_num, len(files), f[len(directory) + 1:])
     try:
       data = pd.read_csv(f)
       data = data.set_index('Date')
@@ -61,7 +66,7 @@ with open(model_file_name, "rb") as f:
         data.loc[idx, 'Prediction'] = model.predict_proba(normalized)[:,1]
         data.loc[idx, 'Prediction Correct'] = bool(model.predict(normalized)[0]) == (data.loc[idx, 'Close'] >= data.loc[idx, 'Open'])
 
-      data = data.dropna
+      data = data.dropna()
       data.to_csv(f.replace(directory, new_directory), sep=',', encoding='utf-8')
     except:
       print "Unable to make predictions for %s." % f[len(directory) + 1:]
