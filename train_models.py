@@ -11,6 +11,7 @@ from sklearn import cross_validation
 
 NUMBER_OF_DAYS_IN_WINDOW = 10
 NUM_DATA_POINTS_PER_DAY = 2
+FILE_NAME = "model.pickle"
 
 def tied_rank(x):
   """
@@ -99,7 +100,13 @@ for row in training:
 X = np.array([p[range(points_in_window - 1)] for p in training])
 y = (training[:, points_in_window - points_per_day + 1] > training[:, points_in_window - points_per_day]) + 0
 
+# build model and save
+model = lm.LogisticRegression(penalty = "l2").fit(X, y)
+
+with open(FILE_NAME, 'wb') as f:
+  pickle.dump(model, f)
+  print("Model saved.")
+
 # print cross validation score
-model = lm.LogisticRegression(penalty = "l2")
 cv_score = np.mean(cross_validation.cross_val_score(model, X, y, cv=5, scoring = auc_scorer))
 print "Cross Validation Score = %f" % cv_score

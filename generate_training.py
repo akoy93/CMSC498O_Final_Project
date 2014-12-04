@@ -23,7 +23,7 @@ results = []
 # process all files
 for f in files:
   i += 1
-  print "(%d/%d) - Normalizing %s..." % (i, len(files), f[len(directory) + 1:])
+  print "(%d/%d) - Generating training data from %s..." % (i, len(files), f[len(directory) + 1:])
   try:
     data = pd.read_csv(f)
 
@@ -45,7 +45,7 @@ for f in files:
 
       results.append(np.hstack(result))
   except:
-    print "ERROR: Unable to generate training data for %s" % f[len(directory) + 1:]
+    print "ERROR: Unable to generate training data from %s" % f[len(directory) + 1:]
 
 results = np.vstack(results)
 np.savetxt(output_file, results, delimiter=",")
