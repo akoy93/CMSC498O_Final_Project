@@ -20,8 +20,9 @@ testing = np.genfromtxt(test_file, delimiter=",")
 
 # normalize
 for row in testing:
-  for i in range(points_in_window - points_per_day + 1):
-    row[i] = row[i] / row[0]
+  opening = row[0]
+  for i in range(points_in_window):
+    row[i] = row[i] / opening
 
 # pull X and y
 X = np.array([p[range(points_in_window - 1)] for p in testing])
