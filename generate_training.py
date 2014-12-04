@@ -43,6 +43,9 @@ for f in files:
       for r in range(num_days_in_window):
         result.append(data[r:(r + data.shape[0] - num_days_in_window + 1),:])
 
+      # reverse results to be in chronological order
+      result = result[::-1]
+
       results.append(np.hstack(result))
   except:
     print "ERROR: Unable to generate training data from %s" % f[len(directory) + 1:]

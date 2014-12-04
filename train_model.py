@@ -96,9 +96,15 @@ for row in training:
   for i in range(points_in_window):
     row[i] = row[i] / opening
 
+for row in training:
+  if row[0] == 0:
+    print row
+
 # pull X and y
 X = np.array([p[range(points_in_window - 1)] for p in training])
 y = (training[:, points_in_window - points_per_day + 1] > training[:, points_in_window - points_per_day]) + 0
+
+print y[0:50]
 
 # build model and save
 model = lm.LogisticRegression(penalty = "l2").fit(X, y)
