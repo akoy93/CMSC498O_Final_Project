@@ -34,7 +34,7 @@ with open(model_file_name, "rb") as f:
     file_num += 1
     print "(%d/%d) - Making predictions for %s..." % (file_num, len(files), f[len(directory) + 1:])
     try:
-      data = pd.read_csv(f)
+      data = pd.read_csv(f)[::-1]
       data = data.set_index('Date')
       data['Prediction'] = np.nan
       data['Prediction Correct'] = np.nan
@@ -53,8 +53,8 @@ with open(model_file_name, "rb") as f:
 
       # result
       idx = data.loc[[0]].index
-      data.loc[idx, 'Prediction'] = model.predict_proba(normalized)[:,1]
-      data.loc[idx, 'Prediction Correct'] = bool(model.predict(normalized)[0]) == (data.loc[idx, 'Close'] >= data.loc[idx, 'Open'])
+      data.loc[idx, 'Prediction'] = model.predict_proba([normalized])[:,1]
+      data.loc[idx, 'Prediction Correct'] = bool(model.predict([normalized])[0]) == (data.loc[idx, 'Close'] >= data.loc[idx, 'Open'])
 
       while i < data.shape[0] - 1:
         i += 1
@@ -63,10 +63,10 @@ with open(model_file_name, "rb") as f:
         window_arr = np.hstack([np.hstack([row['Open'], row['Close']]), window_arr])
         normalized = window_arr / window_arr[0]
         idx = data.loc[[i - NUM_DAYS_IN_WINDOW + 1]].index
-        data.loc[idx, 'Prediction'] = model.predict_proba(normalized)[:,1]
-        data.loc[idx, 'Prediction Correct'] = bool(model.predict(normalized)[0]) == (data.loc[idx, 'Close'] >= data.loc[idx, 'Open'])
+        data.loc[idx, 'Prediction'] = model.predict_proba([normalized])[:,1]
+        data.loc[idx, 'Prediction Correct'] = bool(model.predict([normalized])[0]) == (data.loc[idx, 'Close'] >= data.loc[idx, 'Open'])
 
-      data = data.dropna()
+      data = data.dropna()[::-1]
       data.to_csv(f.replace(directory, new_directory), sep=',', encoding='utf-8')
     except:
       print "Unable to make predictions for %s." % f[len(directory) + 1:]

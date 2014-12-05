@@ -15,20 +15,15 @@ NUM_DATA_POINTS_PER_DAY = 2
 def tied_rank(x):
   """
   This function is by Ben Hamner and taken from https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/auc.py
-
   Computes the tied rank of elements in x.
-
   This function computes the tied rank of elements in x.
-
   Parameters
   ----------
   x : list of numbers, numpy array
-
   Returns
   -------
   score : list of numbers
           The tied rank f each element in x
-
   """
   sorted_x = sorted(zip(x,range(len(x))))
   r = [0 for k in x]
@@ -50,9 +45,7 @@ def auc(actual, posterior):
   This function is by Ben Hamner and taken from https://github.com/benhamner/Metrics/blob/master/Python/ml_metrics/auc.py
   
   Computes the area under the receiver-operater characteristic (AUC)
-
   This function computes the AUC error metric for binary classification.
-
   Parameters
   ----------
   actual : list of binary numbers, numpy array
@@ -60,12 +53,10 @@ def auc(actual, posterior):
   posterior : same type as actual
               Defines a ranking on the binary numbers, from most likely to
               be positive to least likely to be positive.
-
   Returns
   -------
   score : double
           The mean squared error between actual and posterior
-
   """
   r = tied_rank(posterior)
   num_positive = len([0 for x in actual if x==1])
@@ -96,15 +87,9 @@ for row in training:
   for i in range(points_in_window):
     row[i] = row[i] / opening
 
-for row in training:
-  if row[0] == 0:
-    print row
-
 # pull X and y
 X = np.array([p[range(points_in_window - 1)] for p in training])
 y = (training[:, points_in_window - points_per_day + 1] > training[:, points_in_window - points_per_day]) + 0
-
-print y[0:50]
 
 # build model and save
 model = lm.LogisticRegression(penalty = "l2").fit(X, y)

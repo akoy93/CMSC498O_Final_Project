@@ -1,5 +1,5 @@
 data/all_training_500.csv
-data/sp500_training.csv
+data/sp500_500_days.csv
 data/train_with_volume.csv
 data/training.csv
 experiments/grab_stocks.py
