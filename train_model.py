@@ -63,7 +63,6 @@ def auc(actual, posterior):
   num_negative = len(actual)-num_positive
   sum_positive = sum([r[i] for i in range(len(r)) if actual[i]==1])
   auc = ((sum_positive - num_positive*(num_positive+1)/2.0) / (num_negative*num_positive))
-  sys.stdout.write('.')
   return auc
 
 def auc_scorer(estimator, X, y):
