@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+<script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+<link href="http://code.jquery.com/ui/1.9.0/themes/cupertino/jquery-ui.css" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="/css/style.css">
+<head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("visualization", "1", {packages:["controls"]});
+      google.load("visualization", "1", {packages:["table"]});
+      google.load('visualization', '1', {'packages':['annotationchart']});
+
+      var $symbols_path = "../data/sp500_symbols.txt"
+      var $dataset_path = "../data/2014-12-03_3yr_sp500_predictions/"
+      var $entries_per_stock = 7;
+
+      var sym_list = [];
+
+      $(document).ready(function() {
+          // load all stock symbols from file
+          var dsv = d3.dsv("\n", "text/plain");
+          dsv($symbols_path, function(data){
+            sym_list = data.map(function(d) {
+              var sym = d["A"];
+            
+              // create a placeholder table div and chart div for each symbol
+              $( ".container" ).append($("<div class='sym_div' id='" + sym + "'>" 
+              + "<h4 class='symbol_title'>" + sym + "</h4>" + 
+              "<div class=chart_div id='" + sym + "'></div>" + 
+              "<div class=table_div id='" + sym + "'></div></div>"));
+
+              return sym;
+            })
+          });
+
+          google.setOnLoadCallback(drawAll); 
+      });
+
+      // creates tables and charts for each stock
+      function drawAll() {
+        // for each symbol, open it's csv file, and create a new table element
+         sym_list.forEach(function(sym) {
+            // read in the csv file
+            d3.csv($dataset_path + sym + ".csv", function(data) {
+              if(data != null && data != undefined) {
+                  // get relevant columns from dataset as an array of arrays
+                  var dataset = data.map(function(d) {
+                    if(d != undefined) {
+                     return [ 
+                        new Date(d["Date"]), +d["Open"], 
+                        +d["Close"], Math.round(+d["Prediction"] * 1000) / 1000, 
+                        $.parseJSON(d["Prediction Correct"].toLowerCase())
+                      ]; 
+                    }else {
+                      // remove the symbol tables if there is no data for them
+                      $('#' + sym ).remove();
+                      return [];
+                    }
+                  });
+
+                  // add a table and chart for this symbol
+                  if(dataset != null) {
+                    drawTable(dataset, sym);
+                    drawChart(dataset, sym);
+                  }else {
+                    $('#' + sym).remove();
+                  }
+              }else {
+                  $('#' + sym ).remove();
+              }
+          });
+         });
+  
+         addSymbolFilter();
+      }
+
+      // set the search bar to filter divs by symbol
+      function addSymbolFilter() {
+          var divs = $('.sym_div');
+          $('#search').on('keyup', function() {
+              var val = $.trim(this.value);
+              divs.hide();
+              divs.filter(function() {
+                  return $(this).attr('id').search(val) >= 0
+              }).show();
+          });
+      }
+
+      function drawTable(dataset, sym) {
+        // initialize table with columns of dataset to use
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('date', 'Date');
+        dataTable.addColumn('number', 'Open');
+        dataTable.addColumn('number', 'Close');
+        dataTable.addColumn('number', 'Prediction');
+        dataTable.addColumn('boolean', 'Prediction correct?');
+        dataTable.allowHtml = true;
+
+        // print the entries for this dataset
+        var i;
+        var pred_col = 4;
+
+        for(i = 0; i < $entries_per_stock; ++i) {
+          row = dataset[i];
+          dataTable.addRow(row);
+
+          if(row[pred_col] == true) {
+            dataTable.setCell(i, pred_col, true, null, 
+             {'className': 'green-border center-text bold-green-font large-font'});
+          }
+        }
+
+        // add the table to the div for this symbol
+        var table = new google.visualization.Table(
+          document.getElementById(sym).getElementsByClassName("table_div")[0]);
+        table.draw(dataTable, {showRowNumber: true});
+      }
+
+      // add a chart for this symbol to show open vs close prices, 
+      // with annotations that show prediction results
+      function drawChart(dataset, sym) {
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('date', 'Date');
+        dataTable.addColumn('number', 'Open');
+        dataTable.addColumn('number', 'Close');
+        dataTable.addColumn('string', 'Correct Prediction?');
+        dataTable.addColumn('string', 'prediction value');
+        // print the entries for this dataset
+        var i;
+        for(i = 0; i < $entries_per_stock; ++i) {
+          row = dataset[i];
+          // add a text entry for this row to use for annotation
+          // description to show a string with correctness 
+          // (true/false) and the prediction itself
+          row[4] = row[4].toString() + " : " + row[3];
+          row.splice(3,1, "Correct Prediction?:");
+          dataTable.addRow(row);
+        }
+
+        var options = {
+          title: 'Opening vs Closing Prices',
+          hAxis: {title: 'Date',  titleTextStyle: {color: '#333'}},
+          vAxis: {viewWindowMode:'pretty'},
+          displayAnnotations: true
+        };
+
+        // add the chart to the div for this symbol
+        var chart = new google.visualization.AnnotationChart(
+          document.getElementById(sym).getElementsByClassName("chart_div")[0]);
+        chart.draw(dataTable, options);
+      }
+    </script>
+  </head>
+
+  <body>
+    <label for="search" class="symbol_title" >Search By Symbol:</label>
+    <input type="search" name="filter" id="search" class="input-style-1"/>
+
+    <div class="container">
+    </div>
+  </body>
+</html>
