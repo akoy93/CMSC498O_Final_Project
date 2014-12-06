@@ -4,7 +4,7 @@
 <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
 <script src="http://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
 <link href="http://code.jquery.com/ui/1.9.0/themes/cupertino/jquery-ui.css" rel="stylesheet" />
-<link rel="stylesheet" type="text/css" href="/css/style.css">
+<link rel="stylesheet" type="text/css" href="./css/style.css">
 <head>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
@@ -12,8 +12,8 @@
       google.load("visualization", "1", {packages:["table"]});
       google.load('visualization', '1', {'packages':['annotationchart']});
 
-      var $symbols_path = "../data/sp500_symbols.txt"
-      var $dataset_path = "../data/2014-12-03_3yr_sp500_predictions/"
+      var $symbols_path = "../data/2014-12-02_1yr_predictions_sample/sample_symbols.txt"
+      var $dataset_path = "../data/2014-12-02_1yr_predictions_sample/"
       var $entries_per_stock = 7;
 
       var sym_list = [];
@@ -23,7 +23,7 @@
           var dsv = d3.dsv("\n", "text/plain");
           dsv($symbols_path, function(data){
             sym_list = data.map(function(d) {
-              var sym = d["A"];
+              var sym = d["symbol"];
             
               // create a placeholder table div and chart div for each symbol
               $( ".container" ).append($("<div class='sym_div' id='" + sym + "'>" 
@@ -157,8 +157,6 @@
   <body>
     <label for="search" class="symbol_title" >Search By Symbol:</label>
     <input type="search" name="filter" id="search" class="input-style-1"/>
-
-    <div class="container">
-    </div>
+    <div class="container"/>
   </body>
 </html>
