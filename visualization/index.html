@@ -16,9 +16,9 @@
       var $dataset_path = "../data/2014-12-02_1yr_predictions_sample/"
       var $entries_per_stock = 7;
 
-      var sym_list = [];
-
       $(document).ready(function() {
+          var sym_list = [];
+
           // load all stock symbols from file
           var dsv = d3.dsv("\n", "text/plain");
           dsv($symbols_path, function(data){
@@ -33,13 +33,14 @@
 
               return sym;
             })
-          });
 
-          google.setOnLoadCallback(drawAll); 
+            // dsv is an async call, draw all visualizations when done
+            google.setOnLoadCallback(drawAll(sym_list)); 
+          });
       });
 
       // creates tables and charts for each stock
-      function drawAll() {
+      function drawAll(sym_list) {
         // for each symbol, open it's csv file, and create a new table element
          sym_list.forEach(function(sym) {
             // read in the csv file
